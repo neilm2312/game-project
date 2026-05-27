@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://cck6hdm23goax"]
+
+[ext_resource type="Script" uid="uid://ba50t82m64a1q" path="res://characters/player.gd" id="1_3eadt"]
+[ext_resource type="Texture2D" uid="uid://drr8yq3w06eir" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Players/Tiles/tile_0000.png" id="2_tory2"]
+[ext_resource type="Texture2D" uid="uid://nob6hc56fg05" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Players/Tiles/tile_0001.png" id="3_tory2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x0jl3"]
+size = Vector2(12, 11)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_x0jl3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_tory2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_tory2")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="player" type="CharacterBody2D" unique_id=1537883703]
+script = ExtResource("1_3eadt")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2001706958]
+texture = ExtResource("2_tory2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1333593695]
+position = Vector2(1, 5.5)
+shape = SubResource("RectangleShape2D_x0jl3")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1640777226]
+sprite_frames = SubResource("SpriteFrames_x0jl3")
+autoplay = "default"
+frame_progress = 0.40671504
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1084175417]
+position_smoothing_enabled = true
