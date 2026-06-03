@@ -8,8 +8,6 @@ func _physics_process(_delta):
 		Input.get_action_strength("down") - Input.get_action_strength("up")
 	)
 	
-	print(input_direction)
-	
 	velocity = input_direction * move_speed
 	
 	move_and_slide()

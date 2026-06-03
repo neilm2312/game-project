@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://5g5xwwiulv4t"]
+
+[ext_resource type="Script" uid="uid://ccn6knlg85sdx" path="res://rhino.gd" id="1_wwso2"]
+[ext_resource type="Texture2D" uid="uid://g6wed38cm43c" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0002.png" id="2_seo1m"]
+[ext_resource type="Texture2D" uid="uid://bor5rvtafxjx1" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0000.png" id="2_wwso2"]
+[ext_resource type="Texture2D" uid="uid://b4fb3cgsdyefj" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0001.png" id="4_av2sd"]
+[ext_resource type="Texture2D" uid="uid://c0bj71hdwsduw" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0003.png" id="5_823r8"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_udlle"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_seo1m")
+}],
+"loop": true,
+"name": &"charging",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_wwso2")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_823r8")
+}],
+"loop": true,
+"name": &"stunned",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_av2sd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_seo1m")
+}],
+"loop": true,
+"name": &"windup",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_236rk"]
+size = Vector2(15, 9)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_seo1m"]
+radius = 100.0
+
+[node name="rhino" type="CharacterBody2D" unique_id=1247065115]
+collision_layer = 2
+script = ExtResource("1_wwso2")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=454404348]
+position = Vector2(1.1920929e-07, 1.1920929e-07)
+sprite_frames = SubResource("SpriteFrames_udlle")
+animation = &"windup"
+frame_progress = 0.6094645
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=90670054]
+position = Vector2(0.5, 7.5)
+shape = SubResource("RectangleShape2D_236rk")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=899215568]
+
+[node name="WindupTimer" type="Timer" parent="." unique_id=1103290565]
+
+[node name="StunTimer" type="Timer" parent="." unique_id=320890876]
+
+[node name="Area2D" type="Area2D" parent="." unique_id=288378603]
+position = Vector2(1.1920929e-07, 1.1920929e-07)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1854590773]
+shape = SubResource("CircleShape2D_seo1m")

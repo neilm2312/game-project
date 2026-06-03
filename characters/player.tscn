@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cck6hdm23goax"]
 
-[ext_resource type="Script" uid="uid://ba50t82m64a1q" path="res://characters/player.gd" id="1_3eadt"]
+[ext_resource type="Script" uid="uid://ba50t82m64a1q" path="res://player.gd" id="1_3eadt"]
 [ext_resource type="Texture2D" uid="uid://drr8yq3w06eir" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Players/Tiles/tile_0000.png" id="2_tory2"]
 [ext_resource type="Texture2D" uid="uid://nob6hc56fg05" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Players/Tiles/tile_0001.png" id="3_tory2"]
 
@@ -21,7 +21,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="player" type="CharacterBody2D" unique_id=1537883703]
+[node name="player" type="CharacterBody2D" unique_id=1537883703 groups=["player"]]
 script = ExtResource("1_3eadt")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2001706958]
