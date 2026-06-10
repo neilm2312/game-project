@@ -50,9 +50,12 @@ size = Vector2(15, 9)
 [sub_resource type="CircleShape2D" id="CircleShape2D_seo1m"]
 radius = 100.0
 
-[node name="rhino" type="CharacterBody2D" unique_id=1247065115]
+[node name="rhino" type="CharacterBody2D" unique_id=1247065115 groups=["enemy"]]
 collision_layer = 2
 script = ExtResource("1_wwso2")
+wander_speed = 30.0
+wander_circle_distance = 1.0
+wander_circle_radius = 1.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=454404348]
 position = Vector2(1.1920929e-07, 1.1920929e-07)
@@ -70,9 +73,10 @@ shape = SubResource("RectangleShape2D_236rk")
 
 [node name="StunTimer" type="Timer" parent="." unique_id=320890876]
 
-[node name="Area2D" type="Area2D" parent="." unique_id=288378603]
+[node name="DetectionArea" type="Area2D" parent="." unique_id=787094301]
 position = Vector2(1.1920929e-07, 1.1920929e-07)
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1854590773]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1895356576]
+visible = false
 shape = SubResource("CircleShape2D_seo1m")

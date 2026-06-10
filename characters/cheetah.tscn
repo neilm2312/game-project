@@ -1,0 +1,292 @@
+[gd_scene format=3 uid="uid://bmn4ysi51maxe"]
+
+[ext_resource type="Texture2D" uid="uid://bbcdwi4qoklmv" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0006.png" id="2_2muvh"]
+[ext_resource type="Texture2D" uid="uid://bov1dl1ne6xny" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0004.png" id="3_bamg5"]
+[ext_resource type="Texture2D" uid="uid://csvkes6vhg03d" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0007.png" id="4_ep6fi"]
+[ext_resource type="Texture2D" uid="uid://df0jjwqkef3jc" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Enemies/Tiles/tile_0005.png" id="5_mpc40"]
+
+[sub_resource type="GDScript" id="GDScript_ag7uj"]
+script/source = "extends CharacterBody2D
+
+enum State { IDLE, STALKING, WINDUP, POUNCING, CHASING }
+
+# --- Settings ---
+@export var stalk_speed = 80.0
+@export var chase_speed = 350.0
+@export var pounce_speed = 600.0
+@export var pounce_range = 150.0
+@export var detection_range = 400.0
+@export var pounce_trigger_range = 150.0
+@export var windup_time = 0.6
+@export var max_stamina = 3.0
+@export var stamina_recovery = 0.5
+
+# --- State ---
+var state = State.IDLE
+var pounce_direction = Vector2.ZERO
+var pounce_distance_traveled = 0.0
+var stamina = 0.0
+var player = null
+
+@onready var anim = $AnimatedSprite2D
+@onready var windup_timer = $WindupTimer
+@onready var stun_timer = $StunTimer
+@onready var detection_area = $DetectionArea
+@onready var detection_shape = $DetectionArea/CollisionShape2D
+@onready var pounce_area = $PounceArea
+@onready var pounce_shape = $PounceArea/CollisionShape2D
+
+func _ready():
+	# size detection shapes from export variables
+	var outer = CircleShape2D.new()
+	outer.radius = detection_range
+	detection_shape.shape = outer
+
+	var inner = CircleShape2D.new()
+	inner.radius = pounce_trigger_range
+	pounce_shape.shape = inner
+
+	# connect timers
+	windup_timer.wait_time = windup_time
+	windup_timer.one_shot = true
+	stun_timer.one_shot = true
+	windup_timer.timeout.connect(_on_windup_timeout)
+	stun_timer.timeout.connect(_on_stun_timeout)
+
+	# connect detection signals
+	detection_area.body_entered.connect(_on_detection_entered)
+	detection_area.body_exited.connect(_on_detection_exited)
+	pounce_area.body_entered.connect(_on_pounce_range_entered)
+
+	stamina = max_stamina
+	print(\"Cheetah ready\")
+	set_state(State.IDLE)
+
+func _physics_process(delta):
+	match state:
+		State.IDLE:
+			velocity = Vector2.ZERO
+			# recover stamina while idle
+			stamina = min(stamina + stamina_recovery * delta, max_stamina)
+
+		State.STALKING:
+			# recover stamina while stalking
+			stamina = min(stamina + stamina_recovery * delta, max_stamina)
+			if player != null:
+				var dir = (player.global_position - global_position).normalized()
+				velocity = dir * stalk_speed
+
+		State.WINDUP:
+			velocity = Vector2.ZERO
+
+		State.POUNCING:
+			velocity = pounce_direction * pounce_speed
+			move_and_slide()
+			pounce_distance_traveled += pounce_speed * delta
+
+			# hit something — stop
+			if get_slide_collision_count() > 0:
+				set_state(State.IDLE)
+				return
+
+			# missed — start chasing
+			if pounce_distance_traveled >= pounce_range:
+				set_state(State.CHASING)
+			return
+
+		State.CHASING:
+			if player != null:
+				var dir = (player.global_position - global_position).normalized()
+				velocity = dir * chase_speed
+
+			# drain stamina
+			stamina -= delta
+			if stamina <= 0.0:
+				print(\"Cheetah out of stamina\")
+				set_state(State.IDLE)
+				return
+
+			# give up if player leaves detection range
+			if player == null:
+				set_state(State.IDLE)
+				return
+
+	move_and_slide()
+
+# --- Timer callbacks ---
+func _on_windup_timeout():
+	if player != null:
+		pounce_direction = (player.global_position - global_position).normalized()
+	set_state(State.POUNCING)
+
+func _on_stun_timeout():
+	set_state(State.IDLE)
+
+# --- Detection callbacks ---
+func _on_detection_entered(body):
+	if body.is_in_group(\"player\"):
+		print(\"Cheetah: player spotted\")
+		player = body
+		if state == State.IDLE:
+			set_state(State.STALKING)
+
+func _on_detection_exited(body):
+	if body.is_in_group(\"player\"):
+		print(\"Cheetah: player left detection range\")
+		player = null
+		if state == State.STALKING:
+			set_state(State.IDLE)
+
+func _on_pounce_range_entered(body):
+	if body.is_in_group(\"player\"):
+		if state == State.STALKING:
+			print(\"Cheetah: player in pounce range\")
+			set_state(State.WINDUP)
+
+# --- Central state manager ---
+func set_state(new_state: State):
+	state = new_state
+
+	match new_state:
+		State.IDLE:
+			print(\"Cheetah: IDLE\")
+			anim.play(\"idle\")
+
+		State.STALKING:
+			print(\"Cheetah: STALKING\")
+			anim.play(\"stalking\")
+
+		State.WINDUP:
+			print(\"Cheetah: WINDUP\")
+			windup_timer.wait_time = windup_time
+			windup_timer.start()
+			anim.play(\"windup\")
+
+		State.POUNCING:
+			print(\"Cheetah: POUNCING\")
+			pounce_distance_traveled = 0.0
+			anim.play(\"pouncing\")
+
+		State.CHASING:
+			print(\"Cheetah: CHASING\")
+			stamina = max_stamina
+			anim.play(\"chasing\")
+
+# --- Debug Drawing ---
+const DEBUG = true
+
+func _process(_delta):
+	if DEBUG:
+		queue_redraw()
+
+func _draw():
+	if not DEBUG:
+		return
+
+	# outer detection circle
+	draw_arc(Vector2.ZERO, detection_range, 0, TAU, 64, Color.YELLOW, 2.0)
+
+	# inner pounce trigger circle
+	draw_arc(Vector2.ZERO, pounce_trigger_range, 0, TAU, 64, Color.ORANGE, 2.0)
+
+	# pounce direction during windup
+	if state == State.WINDUP and player != null:
+		var dir = (player.global_position - global_position).normalized()
+		draw_dashed_line(Vector2.ZERO, dir * pounce_range, Color.RED, 2.0)
+
+	# remaining pounce distance
+	if state == State.POUNCING:
+		var remaining = pounce_range - pounce_distance_traveled
+		draw_line(Vector2.ZERO, pounce_direction * remaining, Color.RED, 3.0)
+
+	# stamina bar above cheetah
+	if state == State.CHASING:
+		var bar_width = 60.0
+		var stamina_pct = stamina / max_stamina
+		draw_rect(Rect2(Vector2(-30, -50), Vector2(bar_width, 6)), Color.DARK_RED)
+		draw_rect(Rect2(Vector2(-30, -50), Vector2(bar_width * stamina_pct, 6)), Color.GREEN)
+
+	# state color dot
+	var state_colors = {
+		State.IDLE: Color.GRAY,
+		State.STALKING: Color.YELLOW,
+		State.WINDUP: Color.ORANGE,
+		State.POUNCING: Color.RED,
+		State.CHASING: Color.PURPLE
+	}
+	draw_arc(Vector2.ZERO, 6.0, 0, TAU, 16, state_colors[state], 3.0)
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qp52p"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_2muvh")
+}],
+"loop": true,
+"name": &"charging",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_bamg5")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_ep6fi")
+}],
+"loop": true,
+"name": &"stunned",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_bamg5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_mpc40")
+}],
+"loop": true,
+"name": &"windup",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6ct3r"]
+size = Vector2(15, 13)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1kp85"]
+radius = 100.0
+
+[node name="cheetah" type="CharacterBody2D" unique_id=386887234]
+script = SubResource("GDScript_ag7uj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=620012992]
+position = Vector2(1.1920929e-07, 1.1920929e-07)
+sprite_frames = SubResource("SpriteFrames_qp52p")
+animation = &"windup"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1714720985]
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_6ct3r")
+
+[node name="PounceArea" type="Area2D" parent="." unique_id=1592665320]
+position = Vector2(2.3841858e-07, 2.3841858e-07)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PounceArea" unique_id=1010076139]
+shape = SubResource("CircleShape2D_1kp85")
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1869689398]
+position = Vector2(1.1920929e-07, 1.1920929e-07)
+collision_layer = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1629688561]
+shape = SubResource("CircleShape2D_1kp85")
+
+[node name="WindupTimer" type="Timer" parent="." unique_id=1242355078]
+
+[node name="StunTimer" type="Timer" parent="." unique_id=775128999]

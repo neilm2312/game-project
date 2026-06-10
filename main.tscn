@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cqow47bch5ocs"]
+
+[ext_resource type="Script" uid="uid://d2eq6fjf1i6us" path="res://world.gd" id="1_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://cck6hdm23goax" path="res://characters/player/player.tscn" id="2_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://bdx24bq4ycgh3" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Tiles/Tiles/tile_0055.png" id="2_h2yge"]
+[ext_resource type="Texture2D" uid="uid://b17gosa0ewuaf" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Tiles/Tiles/tile_0070.png" id="3_1bvp3"]
+[ext_resource type="Script" uid="uid://bq2vk0sget0go" path="res://enemy_spawner.gd" id="5_lquwl"]
+[ext_resource type="PackedScene" uid="uid://5g5xwwiulv4t" path="res://characters/rhino.tscn" id="6_7mycd"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lquwl"]
+texture = ExtResource("2_h2yge")
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7mycd"]
+texture = ExtResource("3_1bvp3")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+
+[sub_resource type="TileSet" id="TileSet_lquwl"]
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_lquwl")
+sources/1 = SubResource("TileSetAtlasSource_7mycd")
+
+[node name="WorldManager" type="Node2D" unique_id=1276134945]
+script = ExtResource("1_0xm2m")
+player_scene = ExtResource("2_1bvp3")
+
+[node name="TileMap" type="TileMap" parent="." unique_id=1941804828]
+tile_set = SubResource("TileSet_lquwl")
+collision_visibility_mode = 2
+format = 2
+
+[node name="Entities" type="Node2D" parent="." unique_id=382629440]
+
+[node name="EnemySpawner" type="Node" parent="." unique_id=1978101212 node_paths=PackedStringArray("entities")]
+script = ExtResource("5_lquwl")
+entities = NodePath("../Entities")
+enemy_scenes = Array[PackedScene]([ExtResource("6_7mycd")])

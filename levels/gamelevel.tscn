@@ -1,8 +1,11 @@
 [gd_scene format=4 uid="uid://cmcn8ngig6et4"]
 
-[ext_resource type="PackedScene" uid="uid://cck6hdm23goax" path="res://characters/player.tscn" id="1_0hltu"]
-[ext_resource type="PackedScene" uid="uid://5g5xwwiulv4t" path="res://characters/rhino.tscn" id="1_6ftyr"]
+[ext_resource type="PackedScene" uid="uid://5g5xwwiulv4t" path="res://characters/rhino.tscn" id="1_f0u3e"]
+[ext_resource type="PackedScene" uid="uid://cck6hdm23goax" path="res://characters/player/player.tscn" id="2_0hltu"]
 [ext_resource type="Texture2D" uid="uid://bnk2lqcmwhisp" path="res://assets/kenney_desert-shooter-pack_1.0/PNG/Tiles/Tilemap/tilemap_packed.png" id="2_6ftyr"]
+[ext_resource type="PackedScene" uid="uid://dkx8k5sr41jh5" path="res://characters/enemy_base.tscn" id="2_f0u3e"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_5cxro"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_f0u3e"]
 texture = ExtResource("2_6ftyr")
@@ -249,13 +252,22 @@ sources/1 = SubResource("TileSetAtlasSource_f0u3e")
 [node name="gamelevel" type="Node2D" unique_id=1434535434]
 position = Vector2(1, 0)
 
-[node name="rhino" parent="." unique_id=1247065115 instance=ExtResource("1_6ftyr")]
-position = Vector2(145, -110)
-charge_speed = 100.0
-windup_time = 5.0
-stun_time = 50.0
+[node name="rhino" parent="." unique_id=1247065115 instance=ExtResource("1_f0u3e")]
+position = Vector2(-107, -145)
 
-[node name="player" parent="." unique_id=1537883703 instance=ExtResource("1_0hltu")]
+[node name="player" parent="." unique_id=1537883703 instance=ExtResource("2_0hltu")]
+position = Vector2(-40, -57)
+
+[node name="enemy_base" parent="." unique_id=468143206 instance=ExtResource("2_f0u3e")]
+wander_speed = 10.0
+wander_circle_distance = 1.0
+wander_circle_radius = 1.0
+wander_drift_rate = 10.0
+
+[node name="Sprite2D" type="Sprite2D" parent="enemy_base" unique_id=1435680157]
+position = Vector2(-0.9999981, -1.4305115e-06)
+scale = Vector2(16.500002, 13.5)
+texture = SubResource("PlaceholderTexture2D_5cxro")
 
 [node name="Layer1" type="TileMapLayer" parent="." unique_id=166807515]
 z_index = -5

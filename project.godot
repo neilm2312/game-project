@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="New Game Project"
-run/main_scene="uid://cmcn8ngig6et4"
+run/main_scene="uid://cqow47bch5ocs"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -26,6 +26,12 @@ window/stretch/scale=4.0
 
 version_control/plugin_name="GitPlugin"
 version_control/autoload_on_startup=true
+
+[global_group]
+
+player=""
+enemy=""
+level_manager=""
 
 [input]
 
